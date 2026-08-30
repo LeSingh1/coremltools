@@ -11378,6 +11378,12 @@ class TestIndex(TorchBaseTest):
     )
     def test_index_bool_mask_with_another_index(self, compute_unit, backend, frontend):
         """A bool mask paired with a second index selects elements, not whole slices."""
+        if frontend in TORCH_EXPORT_BASED_FRONTENDS:
+            pytest.xfail(
+                "torch.export cannot trace this model: the bool mask makes the intermediate "
+                "size data dependent, so export raises PendingUnbackedSymbolNotFound before "
+                "the converter is reached."
+            )
 
         class IndexModel(torch.nn.Module):
             def forward(self, x):
